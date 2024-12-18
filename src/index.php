@@ -450,6 +450,66 @@
         //     detailsField.classList.toggle('hidden', dropdown.value !== 'เคยเสนอ');
         // }
     </script>
+    <!-- <script>
+    // ฟังก์ชันสำหรับแสดง/ซ่อนฟิลด์
+    function toggleField(dropdownId, fieldId, conditionValue) {
+        const dropdown = document.getElementById(dropdownId);
+        const field = document.getElementById(fieldId);
+        field.style.display = dropdown.value === conditionValue ? 'block' : 'none';
+    }
+
+    // ฟังก์ชันสำหรับรีเซ็ตค่าเมื่อฟิลด์ถูกซ่อน
+    function resetField(fieldId) {
+        const field = document.getElementById(fieldId);
+        field.querySelectorAll('input, textarea, select').forEach(element => {
+            element.value = '';
+        });
+    }
+
+    // Event Listeners สำหรับ dropdowns
+    document.getElementById('article_type').addEventListener('change', () => {
+        toggleField('article_type', 'other_article_type', 'อื่นๆ');
+    });
+
+    document.getElementById('presentation_type').addEventListener('change', () => {
+        toggleField('presentation_type', 'other_presentation_type', 'อื่นๆ');
+    });
+
+    document.getElementById('article_plan').addEventListener('change', () => {
+        toggleField('article_plan', 'other_article_plan', 'อื่นๆ');
+    });
+
+    document.getElementById('past_presentation').addEventListener('change', () => {
+        toggleField('past_presentation', 'past_presentation_details', 'เคยเสนอ');
+    });
+
+    document.getElementById('attached_documents').addEventListener('change', () => {
+        toggleField('attached_documents', 'other_attached_documents_field', 'อื่นๆ');
+    });
+
+    document.getElementById('director_approval').addEventListener('change', () => {
+        toggleField('director_approval', 'director_reason_field', 'ไม่เห็นชอบ');
+    });
+
+    document.getElementById('project_manager_approval').addEventListener('change', () => {
+        toggleField('project_manager_approval', 'project_manager_reason_field', 'ไม่เห็นชอบ');
+    });
+
+    document.getElementById('research_collaborator_approval').addEventListener('change', () => {
+        toggleField('research_collaborator_approval', 'research_collaborator_reason_field', 'ไม่เห็นชอบ');
+    });
+
+    document.getElementById('presentation_purpose').addEventListener('change', () => {
+        const dropdown = document.getElementById('presentation_purpose');
+        toggleField('presentation_purpose', 'sub_purpose', 'โครงการที่ได้รับทุนสนับสนุน');
+        document.getElementById('purpose_text').style.display = 'block';
+    });
+
+    document.getElementById('sub_purpose_select').addEventListener('change', () => {
+        toggleField('sub_purpose_select', 'foreign_purpose', 'ต่างประเทศ');
+    });
+</script> -->
+
 </body>
 
 </html>
