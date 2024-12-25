@@ -1,60 +1,73 @@
 <?php
-// var_dump($_POST); die();
+session_start();
 require __DIR__ . '/vendor/autoload.php'; // Composer autoload
+require_once 'db.php'; // เชื่อมต่อฐานข้อมูล
 
 use setasign\Fpdi\Fpdi;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // รับข้อมูลจากฟอร์ม
-    $firstname = $_POST['firstname'] ?? '';
-    $lastname = $_POST['lastname'] ?? '';
-    $position = $_POST['position'] ?? '';
-    $work_period = $_POST['work_period'] ?? '';
-    $department = $_POST['department'] ?? '';
-    $office = $_POST['office'] ?? '';
-    $phone = $_POST['phone'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $article_title = $_POST['article_title'] ?? '';
-    $first_author = $_POST['first_author'] ?? '';
-    $co_authors = $_POST['co_authors'] ?? '';
-    $additional_info_1 = $_POST['additional_info_1'] ?? '';
-    $additional_info_2 = $_POST['additional_info_2'] ?? '';
-    $final_note = $_POST['final_note'] ?? '';
-    $article_type = $_POST['article_type'] ?? '';
-    $other_type = $_POST['other_type'] ?? '';
-    $presentation_type = $_POST['presentation_type'] ?? '';
-    $other_presentation = $_POST['other_presentation'] ?? '';
-    $conference_name = $_POST['conference_name'] ?? '';
-    // $location = $_POST['location'] ?? '';
-    $location_text = $_POST['location_text'] ?? '';
-    $location = $_POST['location'] ?? '';
-    $submission_date = $_POST['submission_date'] ?? '';
-    $registration_fee = $_POST['registration_fee'] ?? '';
-    $presentation_times = $_POST['presentation_times'] ?? '';
-    $details = $_POST['details'] ?? '';
-    $article_plan = $_POST['article_plan'] ?? '';
-    $other_article_plan_text = $_POST['other_article_plan_text'] ?? '';
-    $budget_source = $_POST['budget_source'] ?? '';
-    $past_presentation = $_POST['past_presentation'] ?? '';
-    $past_presentation_text = $_POST['past_presentation_text'] ?? '';
-    $presentation_purpose = $_POST['presentation_purpose'] ?? '';
-    $sub_purpose_select = $_POST['sub_purpose_select'] ?? '';
-    $foreign_purpose_text = $_POST['foreign_purpose_text'] ?? '';
-    $other_purpose_text = $_POST['other_purpose_text'] ?? '';
-    $article_plan_text = ($article_plan === 'อื่นๆ') ? $other_article_plan_text : $article_plan;
-    $purpose_text = $_POST['purpose_text'] ?? '';
-    $benefit_of_use = $_POST['benefit_of_use'] ?? '';
-    $attached_documents = $_POST['attached_documents'] ?? '';
-    $other_attached_documents_text = $_POST['other_attached_documents_text'] ?? '';
-    $notes = $_POST['notes'] ?? ''; // รับค่าหมายเหตุ หากไม่มีให้เป็นค่าว่าง
-    $date_today = date('d/m/Y'); // วันที่ปัจจุบันในรูปแบบ "วัน/เดือน/ปี"
-    $director_approval = $_POST['director_approval'] ?? '';
-    $director_reason = $_POST['director_reason'] ?? '';
-    $project_manager_approval = $_POST['project_manager_approval'] ?? '';
-    $project_manager_reason = $_POST['project_manager_reason'] ?? '';
-    $research_collaborator_approval = $_POST['research_collaborator_approval'] ?? '';
-    $research_collaborator_reason = $_POST['research_collaborator_reason'] ?? '';
+// ดึงข้อมูลจากฐานข้อมูล
+try {
+    // กำหนด ID ของบทความที่ต้องการ
+    $article_id = $_GET['id'] ?? 3; // ใช้ ID 1 เป็นค่าเริ่มต้น หรือเปลี่ยนเป็น dynamic ได้
 
+    // คำสั่ง SQL สำหรับดึงข้อมูล
+    $stmt = $pdo->prepare("SELECT * FROM articles WHERE id = :id");
+    $stmt->execute(['id' => $article_id]);
+    $article = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$article) {
+        throw new Exception("ไม่พบข้อมูลบทความที่ต้องการ");
+    }
+
+    // ดึงค่าจากฐานข้อมูลมาเก็บในตัวแปร
+    $firstname = $article['firstname'] ?? '';
+    $lastname = $article['lastname'] ?? '';
+    $position = $article['position'] ?? '';
+    $work_period = $article['work_period'] ?? '';
+    $department = $article['department'] ?? '';
+    $office = $article['office'] ?? '';
+    $phone = $article['phone'] ?? '';
+    $email = $article['email'] ?? '';
+    $article_title = $article['article_title'] ?? '';
+    $first_author = $article['first_author'] ?? '';
+    $co_authors = $article['co_authors'] ?? '';
+    $article_type = $article['article_type'] ?? '';
+    $other_type = $article['other_article_type'] ?? '';
+    $presentation_type = $article['presentation_type'] ?? '';
+    $other_presentation = $article['other_presentation'] ?? '';
+    $conference_name = $article['conference_name'] ?? '';
+    $location = $article['location'] ?? '';
+    $location_text = $article['location_text'] ?? '';
+    $submission_date = $article['submission_date'] ?? '';
+    $registration_fee = $article['registration_fee'] ?? '';
+    $presentation_times = $article['presentation_times'] ?? '';
+    $details = $article['details'] ?? '';
+    $article_plan = $article['article_plan'] ?? '';
+    $other_article_plan_text = $article['other_article_plan'] ?? '';
+    $budget_source = $article['budget_source'] ?? '';
+    $past_presentation = $article['past_presentation'] ?? '';
+    $past_presentation_text = $article['past_presentation_text'] ?? '';
+    $presentation_purpose = $article['presentation_purpose'] ?? '';
+    $sub_purpose_select = $article['sub_purpose_select'] ?? '';
+    $foreign_purpose_text = $article['foreign_purpose_text'] ?? '';
+    $purpose_text = $article['purpose_text'] ?? '';
+    $benefit_of_use = $article['benefit_of_use'] ?? '';
+    $attached_documents = $article['attached_documents'] ?? '';
+    $other_attached_documents_text = $article['other_attached_documents'] ?? '';
+    $notes = $article['notes'] ?? '';
+    $director_approval = $article['director_approval'] ?? '';
+    $director_reason = $article['director_reason'] ?? '';
+    $project_manager_approval = $article['project_manager_approval'] ?? '';
+    $project_manager_reason = $article['project_manager_reason'] ?? '';
+    $research_collaborator_approval = $article['research_collaborator_approval'] ?? '';
+    $research_collaborator_reason = $article['research_collaborator_reason'] ?? '';
+    $date_today = date('d/m/Y');
+
+    $additional_info_1 = $article['additional_info_1'] ?? ''; // ค่าเริ่มต้น
+    $additional_info_2 = $article['additional_info_2'] ?? ''; // ค่าเริ่มต้น
+    $final_note = $article['final_note'] ?? ''; // ค่าเริ่มต้น
+    $article_plan_text = $article_plan === 'อื่นๆ' ? $other_article_plan_text : $article_plan; // เลือกข้อความที่เหมาะสม
+    $other_purpose_text = $purpose_text; // กำหนดค่าตาม context
     if ($article_type === 'อื่นๆ') {
         $article_type_text = $other_type;
     } else {
@@ -67,58 +80,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $presentation_type_text = $presentation_type;
     }
+    // แปลงข้อความด้วย iconv หากไม่ใช่ null
+    $convertToCp874 = function ($text) {
+        return $text !== null ? iconv('UTF-8', 'cp874', $text) : '';
+    };
 
-    // if ($Article_submission_plan === 'อื่นๆ'){
-    //     $Article_submission_plan_text = $other_artclesubmission;
-    // } else{
-    //     $Article_submission_plan_text = $Article_submission_plan;
-    // }
-    // แปลงข้อความให้รองรับภาษาไทย (cp874)
-    $firstname = iconv('UTF-8', 'cp874', $firstname);
-    $lastname = iconv('UTF-8', 'cp874', $lastname);
-    $position = iconv('UTF-8', 'cp874', $position);
-    $work_period = iconv('UTF-8', 'cp874', $work_period);
-    $department = iconv('UTF-8', 'cp874', $department);
-    $office = iconv('UTF-8', 'cp874', $office);
-    $phone = iconv('UTF-8', 'cp874', $phone);
-    $email = iconv('UTF-8', 'cp874', $email);
-    $article_title = iconv('UTF-8', 'cp874', $article_title);
-    $first_author = iconv('UTF-8', 'cp874', $first_author);
-    $co_authors = iconv('UTF-8', 'cp874', $co_authors);
-    $additional_info_1 = iconv('UTF-8', 'cp874', $additional_info_1);
-    $additional_info_2 = iconv('UTF-8', 'cp874', $additional_info_2);
-    $final_note = iconv('UTF-8', 'cp874', $final_note);
-    $article_type_text = iconv('UTF-8', 'cp874', $article_type_text);
-    $presentation_type_text = iconv('UTF-8', 'cp874', $presentation_type_text);
-    $conference_name = iconv('UTF-8', 'cp874', $conference_name);
-    // $location = iconv('UTF-8', 'cp874', $location);
-    $location_text = iconv('UTF-8', 'cp874', $location_text);
-    $submission_date = iconv('UTF-8', 'cp874', $submission_date);
-    $registration_fee = iconv('UTF-8', 'cp874', $registration_fee);
-    $presentation_times = iconv('UTF-8', 'cp874', $presentation_times);
-    $details = iconv('UTF-8', 'cp874', $details);
-    // $Article_submission_plan = iconv('UTF-8', 'cp874', $Article_submission_plan);
-    // $other_artclesubmission = iconv('UTF-8', 'cp874', $other_artclesubmission);
-    $article_plan_text = iconv('UTF-8', 'cp874', $article_plan_text);
-    $budget_source = iconv('UTF-8', 'cp874', $budget_source);
-    $past_presentation_text = iconv('UTF-8', 'cp874', $past_presentation_text);
-    // $presentation_purpose = iconv('UTF-8', 'cp874', $presentation_purpose);
-    // $sub_purpose_select = iconv('UTF-8', 'cp874', $sub_purpose_select);
-    $foreign_purpose_text = iconv('UTF-8', 'cp874', $foreign_purpose_text);
-    $other_purpose_text = iconv('UTF-8', 'cp874', $other_purpose_text);
-    // $options = iconv('UTF-8', 'cp874', $options);
-    $purpose_text  = iconv('UTF-8', 'cp874', $purpose_text);
-    $benefit_of_use = iconv('UTF-8', 'cp874', $benefit_of_use);
-    $other_attached_documents_text = iconv('UTF-8', 'cp874', $other_attached_documents_text);
-    $notes = iconv('UTF-8', 'cp874', $notes);
-    // $director_approval = iconv('UTF-8', 'cp874',$director_approval);
-    $director_reason = iconv('UTF-8', 'cp874', $director_reason);
-    // $project_manager_approval = iconv('UTF-8', 'cp874', $project_manager_approval);
-    $project_manager_reason = iconv('UTF-8', 'cp874', $project_manager_reason);
-    $research_collaborator_reason = iconv('UTF-8', 'cp874', $research_collaborator_reason);
+    $firstname = $convertToCp874($firstname);
+    $lastname = $convertToCp874($lastname);
+    $position = $convertToCp874($position);
+    $work_period = $convertToCp874($work_period);
+    $department = $convertToCp874($department);
+    $office = $convertToCp874($office);
+    $phone = $convertToCp874($phone);
+    $email = $convertToCp874($email);
+    $article_title = $convertToCp874($article_title);
+    $first_author = $convertToCp874($first_author);
+    $co_authors = $convertToCp874($co_authors);
+    $additional_info_1 = $convertToCp874($additional_info_1);
+    $additional_info_2 = $convertToCp874($additional_info_2);
+    $final_note = $convertToCp874($final_note);
+    $article_type_text = $convertToCp874($article_type === 'อื่นๆ' ? $other_type : $article_type);
+    $presentation_type_text = $convertToCp874($presentation_type === 'อื่นๆ' ? $other_presentation : $presentation_type);
+    $conference_name = $convertToCp874($conference_name);
+    $location_text = $convertToCp874($location_text);
+    $submission_date = $convertToCp874($submission_date);
+    $registration_fee = $convertToCp874($registration_fee);
+    $presentation_times = $convertToCp874($presentation_times);
+    $details = $convertToCp874($details);
+    $article_plan_text = $convertToCp874($article_plan_text);
+    $budget_source = $convertToCp874($budget_source);
+    $past_presentation_text = $convertToCp874($past_presentation_text);
+    $foreign_purpose_text = $convertToCp874($foreign_purpose_text);
+    $other_purpose_text = $convertToCp874($other_purpose_text);
+    $benefit_of_use = $convertToCp874($benefit_of_use);
+    $other_attached_documents_text = $convertToCp874($other_attached_documents_text);
+    $notes = $convertToCp874($notes);
+    $director_reason = $convertToCp874($director_reason);
+    $project_manager_reason = $convertToCp874($project_manager_reason);
+    $research_collaborator_reason = $convertToCp874($research_collaborator_reason);
+    $purpose_text = $convertToCp874($purpose_text);
+    $other_type = $convertToCp874($other_type);
 
 
-
+   
+    
+    // ส่วนที่เหลือใช้โค้ดการสร้าง PDF เดิม
     // โหลดฟอร์ม PDF
     $pdf = new Fpdi();
 
@@ -666,6 +672,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     // ส่งออก PDF
     $pdf->Output('I', 'filled-form.pdf');
-} else {
-    echo "Method not allowed!";
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
 }

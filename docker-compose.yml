@@ -7,6 +7,44 @@ services:
       dockerfile: Dockerfile
     container_name: php-fpdi-app
     volumes:
-      - ./src:/var/www/html
+      - ./src:/var/www/html  # Mount โฟลเดอร์ src จากโฮสต์ไปยัง container
     ports:
-      - "8080:80"
+      - "8080:80"  # เปิดพอร์ต 8080 บนโฮสต์ และ map ไปยังพอร์ต 80 ของ container
+    depends_on:
+      - database  # ให้รัน service database ก่อนเริ่ม container นี้
+    environment:  # กำหนด environment variables สำหรับเชื่อมต่อฐานข้อมูล
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_DATABASE: app_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+  database:
+    image: mysql:8.0  # ใช้ MySQL เวอร์ชัน 8.0
+    container_name: app-database
+    restart: always  # ให้ container รีสตาร์ทใหม่เมื่อเกิดข้อผิดพลาด
+    environment:
+      MYSQL_ROOT_PASSWORD: root  # รหัสผ่าน root ของ MySQL
+      MYSQL_DATABASE: app_db     # ชื่อฐานข้อมูลเริ่มต้น
+      MYSQL_USER: app_user       # ชื่อผู้ใช้งาน
+      MYSQL_PASSWORD: app_password  # รหัสผ่านของผู้ใช้งาน
+    ports:
+      - "3306:3306"  # เปิดพอร์ต 3306 บนโฮสต์และ map ไปยัง container
+    volumes:
+      - db_data:/var/lib/mysql  # Mount volume เพื่อเก็บข้อมูลถาวรของ MySQL
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin  # ใช้ phpMyAdmin official image
+    container_name: app-phpmyadmin
+    restart: always  # ให้ container รีสตาร์ทใหม่เมื่อเกิดข้อผิดพลาด
+    depends_on:
+      - database  # ให้รัน service database ก่อนเริ่ม container นี้
+    environment:  # กำหนดค่าการเชื่อมต่อ MySQL
+      PMA_HOST: database
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root  # รหัสผ่าน root ของ MySQL
+    ports:
+      - "8081:80"  # เปิดพอร์ต 8081 บนโฮสต์ และ map ไปยังพอร์ต 80 ของ container
+
+volumes:
+  db_data:  # Volume สำหรับเก็บข้อมูลถาวรของ MySQL
