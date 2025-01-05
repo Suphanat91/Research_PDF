@@ -82,15 +82,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
             $pdf->MultiCell($comments_width, $line_height, $line, 0, 'L');
         }
     }
+    // คำนวณผลรวมคะแนน
+    $total_score = 0;
+    foreach ($score_positions as $key => $base_y) {
+        $score = $evaluation[$key] ?? 0;
+        $total_score += (int)$score;
+    }
 
+    // เพิ่มผลรวมคะแนนใน PDF
+    $total_score_text = "$total_score";
+    $total_score_text_cp874 = iconv('UTF-8', 'cp874', $total_score_text);
+
+    // กำหนดตำแหน่งสำหรับแสดงผลรวมคะแนน
+    $pdf->SetXY(155, 155); // ตำแหน่ง X และ Y (ปรับตามที่ต้องการ)
+    $pdf->Write(0, $total_score_text_cp874);
     // ฟังก์ชันแปลงวันที่เป็นภาษาไทย
     function thaiDate($date)
     {
         $thai_months = [
-            1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม',
-            4 => 'เมษายน', 5 => 'พฤษภาคม', 6 => 'มิถุนายน',
-            7 => 'กรกฎาคม', 8 => 'สิงหาคม', 9 => 'กันยายน',
-            10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
+            1 => 'มกราคม',
+            2 => 'กุมภาพันธ์',
+            3 => 'มีนาคม',
+            4 => 'เมษายน',
+            5 => 'พฤษภาคม',
+            6 => 'มิถุนายน',
+            7 => 'กรกฎาคม',
+            8 => 'สิงหาคม',
+            9 => 'กันยายน',
+            10 => 'ตุลาคม',
+            11 => 'พฤศจิกายน',
+            12 => 'ธันวาคม'
         ];
 
         $year = date('Y', strtotime($date)) + 543;

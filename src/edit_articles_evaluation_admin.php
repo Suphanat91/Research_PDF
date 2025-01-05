@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require 'db.php';
 $title = "Admin Dashboard";
@@ -98,29 +99,101 @@ ob_start();
                                     </svg>
                                     Committee Evaluation
                                 </a>
+                                <!-- Edit Article -->
+                                <a href="edit_committee_evaluation.php?id=<?php echo $article['id']; ?>"
+                                    class="inline-flex items-center justify-center px-4 py-2.5 text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 rounded-lg font-medium transition duration-200 group">
+                                    <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232a3 3 0 114.243 4.243L8.475 20.475a3 3 0 01-1.414.829l-4.242.848a1 1 0 01-1.2-1.2l.848-4.242a3 3 0 01.829-1.414L15.232 5.232z"></path>
+                                    </svg>
+                                    Edit Article
+                                </a>
+
+                                <!-- Delete Article -->
+                                <!-- <a href="delete_article.php?id=<?php echo $article['id']; ?>"
+                                    onclick="return confirm('Are you sure you want to delete this article? This action cannot be undone.');"
+                                    class="inline-flex items-center justify-center px-4 py-2.5 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg font-medium transition duration-200 group">
+                                    <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13H4l1.585-1.585A2 2 0 019 11h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-3.586L4 13h5z"></path>
+                                    </svg>
+                                    Delete Article
+                                </a> -->
+                                <a href="javascript:void(0);"
+                                    onclick="confirmDelete(<?php echo $article['id']; ?>)"
+                                    class="inline-flex items-center justify-center px-4 py-2.5 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg font-medium transition duration-200 group">
+                                    <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13H4l1.585-1.585A2 2 0 019 11h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-3.586L4 13h5z"></path>
+                                    </svg>
+                                    Delete Article
+                                </a>
+
+
+                                <div id="delete-popup" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+                                    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                                        <h2 class="text-xl font-semibold text-red-600 mb-4">Are you sure you want to delete this Evaluation results?</h2>
+                                        <p class="text-gray-600 mb-6">This action cannot be undone.</p>
+                                        <div class="flex justify-center gap-4">
+                                            <button id="cancel-delete" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 text-gray-800">
+                                                Cancel
+                                            </button>
+                                            <a id="confirm-delete" href="#"
+                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                                                Confirm
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </article>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
 </div>
-<?php
-if (isset($_GET['success'])) {
-    $success_message = '';
-    switch ($_GET['success']) {
-        case 'evaluation_updated':
-            $success_message = 'Evaluation updated successfully!';
-            break;
-        case 'evaluation_deleted':
-            $success_message = 'Evaluation deleted successfully!';
-            break;
+<script>
+    function confirmDelete(articleId) {
+        const popup = document.getElementById('delete-popup');
+        const confirmButton = document.getElementById('confirm-delete');
+        confirmButton.href = 'delete_article.php?id=' + articleId; // ลิงก์ไปยังหน้าลบ
+        popup.style.display = 'flex';
     }
-}
-?>
 
+    document.getElementById('cancel-delete').addEventListener('click', function () {
+        document.getElementById('delete-popup').style.display = 'none';
+    });
+</script>
+<style>
+    #delete-popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
 
+    #delete-popup .bg-white {
+        max-width: 400px;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
 <?php
 $content = ob_get_clean();
 include 'layout3.php';

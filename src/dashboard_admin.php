@@ -106,7 +106,60 @@ ob_start();
         </div>
     <?php endif; ?>
 </div>
+<?php
+if (isset($_GET['success']) && $_GET['success'] === 'evaluation_updated') {
+    $success_message = "Evaluation updated successfully!";
+}
+?>
 
+<?php if (!empty($success_message)): ?>
+    <div id="success-popup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div class="bg-white rounded-lg p-6 text-center shadow-lg">
+            <h2 class="text-xl font-bold text-green-600 mb-4">Success</h2>
+            <p class="text-gray-700 mb-4"><?php echo htmlspecialchars($success_message); ?></p>
+            <button id="close-popup" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Close</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('close-popup').addEventListener('click', function () {
+            document.getElementById('success-popup').style.display = 'none';
+        });
+    </script>
+    <style>
+    #success-popup {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    #success-popup .bg-white {
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 400px;
+        text-align: center;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
+<?php endif; ?>
 <?php
 $content = ob_get_clean();
 include 'layout3.php';

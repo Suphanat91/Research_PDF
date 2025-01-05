@@ -53,15 +53,16 @@ $logged_in_role = $_SESSION['role'] ?? 'User'; // บทบาทผู้ใช
                     <i class="fas fa-home w-5"></i>
                     <span class="ml-3">Unevaluated Works</span>
                 </a>
+                <a href="edit_articles_evaluation_admin.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
+                    <i class="fas fa-microscope w-5"></i>
+                    <span class="ml-3">Edit&Delete Evaluation</span>
+                </a>
                 <a href="dashboard_for_admin.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
                     <i class="fas fa-book w-5"></i>
                     <span class="ml-3">Evaluation Results</span>
                 </a>
-                <!-- <a href="research.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
-                    <i class="fas fa-microscope w-5"></i>
-                    <span class="ml-3">Research</span>
-                </a>
-                <a href="publications.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
+              
+                <!-- <a href="publications.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
                     <i class="fas fa-file-alt w-5"></i>
                     <span class="ml-3">Publications</span>
                 </a>

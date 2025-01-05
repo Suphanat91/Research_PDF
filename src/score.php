@@ -1,20 +1,20 @@
 <?php
 session_start();
 require 'db.php';
-$title = "Admin Dashboard";
+$title = "Dashboard";
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'author') {
     header("Location: index.php");
     exit();
 }
 
-$firstname = $_SESSION['firstname'] ?? 'Admin';
+$firstname = $_SESSION['firstname'] ?? 'author';
 
 $stmt = $pdo->prepare("
     SELECT articles.*, users.firstname AS author_name, DATE_FORMAT(articles.created_at, '%d %M %Y') as formatted_date 
     FROM articles
     JOIN users ON articles.users_user_id = users.user_id
-    WHERE articles.state = 3
+    WHERE articles.state IN (2, 3)
     ORDER BY articles.created_at DESC
 ");
 $stmt->execute();
@@ -91,13 +91,15 @@ ob_start();
                                     </svg>
                                     View Evaluation
                                 </a>
-                                <a href="view_committee_evaluation.php?id=<?php echo $article['id']; ?>"
-                                    class="inline-flex items-center justify-center px-4 py-2.5 text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg font-medium transition duration-200 group">
-                                    <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2h11a2 2h2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    Committee Evaluation
-                                </a>
+                                <?php if ($article['state'] == 3): ?>
+                                    <a href="view_committee_evaluation.php?id=<?php echo $article['id']; ?>"
+                                        class="inline-flex items-center justify-center px-4 py-2.5 text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg font-medium transition duration-200 group">
+                                        <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2h11a2 2h2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        Committee Evaluation
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -106,22 +108,8 @@ ob_start();
         </div>
     <?php endif; ?>
 </div>
-<?php
-if (isset($_GET['success'])) {
-    $success_message = '';
-    switch ($_GET['success']) {
-        case 'evaluation_updated':
-            $success_message = 'Evaluation updated successfully!';
-            break;
-        case 'evaluation_deleted':
-            $success_message = 'Evaluation deleted successfully!';
-            break;
-    }
-}
-?>
-
 
 <?php
 $content = ob_get_clean();
-include 'layout3.php';
+include 'layout.php';
 ?>

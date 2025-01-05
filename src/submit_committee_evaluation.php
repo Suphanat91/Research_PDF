@@ -2,33 +2,36 @@
 session_start();
 require 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $article_id = $_POST['article_id'];
-    $appropriateness_of_presenter = $_POST['appropriateness_of_presenter'];
-    $appropriateness_of_location = $_POST['appropriateness_of_location'];
-    $overall_decision = $_POST['overall_decision'];
-    $user_id = $_SESSION['user_id'];
+    $presenter = $_POST['appropriateness_of_presenter'];
+    $location = $_POST['appropriateness_of_location'];
+    $decision = $_POST['overall_decision'];
 
-    // Insert committee evaluation
-    $stmt = $pdo->prepare("
-        INSERT INTO committee_evaluation 
-        (appropriateness_of_presenter, appropriateness_of_location, overall_decision, articles_id, users_user_id, created_at) 
-        VALUES (?, ?, ?, ?, ?, NOW())
-    ");
-    $evaluation_saved = $stmt->execute([
-        $appropriateness_of_presenter, $appropriateness_of_location, $overall_decision, $article_id, $user_id
-    ]);
+    // ตรวจสอบว่ามีการประเมินอยู่หรือไม่
+    $stmt = $pdo->prepare("SELECT * FROM committee_evaluation WHERE articles_id = ?");
+    $stmt->execute([$article_id]);
+    $evaluation = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($evaluation_saved) {
-        // Update state to 3 in articles table
-        $update_stmt = $pdo->prepare("UPDATE articles SET state = 3 WHERE id = ?");
-        $update_stmt->execute([$article_id]);
-
-        header("Location: dashboard_admin.php?success=1");
-        exit();
+    if ($evaluation) {
+        // อัปเดตข้อมูลการประเมิน
+        $stmt = $pdo->prepare("
+            UPDATE committee_evaluation 
+            SET appropriateness_of_presenter = ?, appropriateness_of_location = ?, overall_decision = ?, updated_at = NOW()
+            WHERE articles_id = ?
+        ");
+        $stmt->execute([$presenter, $location, $decision, $article_id]);
+    } else {
+        // เพิ่มข้อมูลการประเมินใหม่
+        $stmt = $pdo->prepare("
+            INSERT INTO committee_evaluation (appropriateness_of_presenter, appropriateness_of_location, overall_decision, articles_id, users_user_id, created_at)
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([$presenter, $location, $decision, $article_id, $_SESSION['user_id']]);
     }
-}
 
-header("Location: dashboard_admin.php?error=1");
-exit();
+    // Redirect ไปหน้า dashboard_admin.php พร้อมพารามิเตอร์ success
+    header("Location: dashboard_admin.php?success=evaluation_updated");
+    exit();
+}
 ?>

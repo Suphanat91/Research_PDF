@@ -5,6 +5,7 @@ require_once 'db.php'; // เชื่อมต่อฐานข้อมูล
 
 use setasign\Fpdi\Fpdi;
 
+
 // ดึงข้อมูลจากฐานข้อมูล
 try {
     // กำหนด ID ของบทความที่ต้องการ
@@ -120,10 +121,36 @@ try {
     $research_collaborator_reason = $convertToCp874($research_collaborator_reason);
     $purpose_text = $convertToCp874($purpose_text);
     $other_type = $convertToCp874($other_type);
+    // $date = $convertToCp874($date);
 
 
-   
-    
+
+
+
+    function thaiDate($date)
+    {
+        $thai_months = [
+            1 => 'มกราคม',
+            2 => 'กุมภาพันธ์',
+            3 => 'มีนาคม',
+            4 => 'เมษายน',
+            5 => 'พฤษภาคม',
+            6 => 'มิถุนายน',
+            7 => 'กรกฎาคม',
+            8 => 'สิงหาคม',
+            9 => 'กันยายน',
+            10 => 'ตุลาคม',
+            11 => 'พฤศจิกายน',
+            12 => 'ธันวาคม'
+        ];
+
+        $year = date('Y', strtotime($date)) + 543;
+        $month = $thai_months[date('n', strtotime($date))];
+        $day = date('j', strtotime($date));
+
+        return "$day $month $year";
+    }
+
     // ส่วนที่เหลือใช้โค้ดการสร้าง PDF เดิม
     // โหลดฟอร์ม PDF
     $pdf = new Fpdi();
@@ -152,11 +179,11 @@ try {
     $pdf->SetXY(151, 61.7);
     $pdf->MultiCell(30, 5, $work_period, 0, 'C'); // ช่องข้อความสำหรับช่วงเวลาทำงาน
 
-    $pdf->SetXY(25, 69.4);
+    $pdf->SetXY(20, 69.7);
     $pdf->MultiCell(80, 5, $department, 0, 'C'); // ช่องข้อความสำหรับแผนก
 
-    $pdf->SetXY(90, 69.4);
-    $pdf->MultiCell(60, 5, $office, 0, 'C'); // ช่องข้อความสำหรับสำนักงาน
+    $pdf->SetXY(92, 69.4);
+    $pdf->MultiCell(100, 5, $office, 0, 'C'); // ช่องข้อความสำหรับสำนักงาน
 
     $pdf->SetXY(40, 78);
     $pdf->MultiCell(50, 5, $phone, 0, 'C'); // ช่องข้อความสำหรับโทรศัพท์
@@ -164,13 +191,9 @@ try {
     $pdf->SetXY(105, 78);
     $pdf->MultiCell(60, 5, $email, 0, 'C'); // ช่องข้อความสำหรับอีเมล
 
-    $max_words = 25;
-    $article_words = explode(' ', $article_title); // แยกข้อความออกเป็นคำ
-    if (count($article_words) > $max_words) {
-        $article_title = implode(' ', array_slice($article_words, 0, $max_words)); // ตัดเหลือ 25 คำ
-    }
-    $pdf->SetXY(50, 96);
-    $pdf->MultiCell(100, 7.8, $article_title, 0, 'L'); // 100 = ความกว้าง, 6 = ระยะห่างบรรทัด
+    $article_title = "                " . $article_title; // เพิ่ม 4 ช่องว่างสำหรับย่อหน้า
+    $pdf->SetXY(27, 96);
+    $pdf->MultiCell(150, 7.8, $article_title, 0, 'L');
 
     $pdf->SetXY(105, 131);
     $pdf->Write(0, "$first_author");
@@ -362,50 +385,68 @@ try {
 
     // ข้อมูลการกำหนดบรรทัด
     // ข้อมูลการกำหนดบรรทัด
-    $max_words_first_line = 22; // จำนวนคำสูงสุดสำหรับบรรทัดแรก
-    $max_words_other_lines = 25; // จำนวนคำสูงสุดสำหรับบรรทัดถัดไป
-    $max_lines = 3; // จำนวนบรรทัดสูงสุด
+    // $max_words_first_line = 22; // จำนวนคำสูงสุดสำหรับบรรทัดแรก
+    // $max_words_other_lines = 25; // จำนวนคำสูงสุดสำหรับบรรทัดถัดไป
+    // $max_lines = 3; // จำนวนบรรทัดสูงสุด
+
+    // // ตำแหน่งเริ่มต้น
+    // $first_line_x = 50; // ตำแหน่ง X สำหรับบรรทัดแรก
+    // $first_line_y = 243; // ตำแหน่ง Y สำหรับบรรทัดแรก
+    // $other_lines_x = 20; // ตำแหน่ง X สำหรับบรรทัดถัดไป
+    // $line_height = 8; // ระยะห่างระหว่างบรรทัด
+
+    // // แยกข้อความเป็นคำ
+    // $words = explode(' ', $details);
+
+    // // ตัดข้อความสำหรับบรรทัดแรก
+    // $first_line_words = array_slice($words, 0, $max_words_first_line);
+    // $first_line = implode(' ', $first_line_words);
+
+    // // เหลือข้อความที่เหลือจากบรรทัดแรก
+    // $remaining_words = array_slice($words, $max_words_first_line);
+
+    // // แยกข้อความที่เหลือสำหรับบรรทัดถัดไป
+    // $other_lines = [];
+    // while (!empty($remaining_words)) {
+    //     $current_line_words = array_slice($remaining_words, 0, $max_words_other_lines);
+    //     $other_lines[] = implode(' ', $current_line_words);
+    //     $remaining_words = array_slice($remaining_words, $max_words_other_lines);
+    // }
+
+    // // จำกัดจำนวนบรรทัดที่จะแสดง
+    // $lines_to_print = array_slice(array_merge([$first_line], $other_lines), 0, $max_lines);
+
+    // $current_y = $first_line_y;
+
+    // // แสดงข้อความในแต่ละบรรทัด
+    // foreach ($lines_to_print as $index => $line) {
+    //     // ปรับตำแหน่ง X สำหรับบรรทัดแรกและบรรทัดถัดไป
+    //     $current_x = $index === 0 ? $first_line_x : $other_lines_x;
+
+    //     // กำหนดตำแหน่งและแสดงข้อความ
+    //     $pdf->SetXY($current_x, $current_y);
+    //     $pdf->MultiCell(130, $line_height, $line, 0, 'L'); // ใช้ MultiCell เพื่อจัดข้อความและหลีกเลี่ยงกรอบ
+    //     $current_y += $line_height; // เพิ่มตำแหน่ง Y สำหรับบรรทัดถัดไป
+    // }
+    // เพิ่มช่องว่างสำหรับย่อหน้าบรรทัดแรก
+    // เพิ่มช่องว่างสำหรับย่อหน้าบรรทัดแรก
+    $details = "                " . $details; // เพิ่ม 4 ช่องว่างในบรรทัดแรก
 
     // ตำแหน่งเริ่มต้น
-    $first_line_x = 50; // ตำแหน่ง X สำหรับบรรทัดแรก
-    $first_line_y = 243; // ตำแหน่ง Y สำหรับบรรทัดแรก
+    $first_line_x = 27; // ตำแหน่ง X สำหรับบรรทัดแรก
+    $first_line_y = 244; // ตำแหน่ง Y สำหรับบรรทัดแรก
     $other_lines_x = 20; // ตำแหน่ง X สำหรับบรรทัดถัดไป
     $line_height = 8; // ระยะห่างระหว่างบรรทัด
+    $cell_width = 150; // ความกว้างของ MultiCell
 
-    // แยกข้อความเป็นคำ
-    $words = explode(' ', $details);
+    // แสดงข้อความในบรรทัดแรก
+    $pdf->SetXY($first_line_x, $first_line_y);
+    $pdf->MultiCell($cell_width, $line_height, $details, 0, 'L');
 
-    // ตัดข้อความสำหรับบรรทัดแรก
-    $first_line_words = array_slice($words, 0, $max_words_first_line);
-    $first_line = implode(' ', $first_line_words);
-
-    // เหลือข้อความที่เหลือจากบรรทัดแรก
-    $remaining_words = array_slice($words, $max_words_first_line);
-
-    // แยกข้อความที่เหลือสำหรับบรรทัดถัดไป
-    $other_lines = [];
-    while (!empty($remaining_words)) {
-        $current_line_words = array_slice($remaining_words, 0, $max_words_other_lines);
-        $other_lines[] = implode(' ', $current_line_words);
-        $remaining_words = array_slice($remaining_words, $max_words_other_lines);
-    }
-
-    // จำกัดจำนวนบรรทัดที่จะแสดง
-    $lines_to_print = array_slice(array_merge([$first_line], $other_lines), 0, $max_lines);
-
-    $current_y = $first_line_y;
-
-    // แสดงข้อความในแต่ละบรรทัด
-    foreach ($lines_to_print as $index => $line) {
-        // ปรับตำแหน่ง X สำหรับบรรทัดแรกและบรรทัดถัดไป
-        $current_x = $index === 0 ? $first_line_x : $other_lines_x;
-
-        // กำหนดตำแหน่งและแสดงข้อความ
-        $pdf->SetXY($current_x, $current_y);
-        $pdf->MultiCell(130, $line_height, $line, 0, 'L'); // ใช้ MultiCell เพื่อจัดข้อความและหลีกเลี่ยงกรอบ
-        $current_y += $line_height; // เพิ่มตำแหน่ง Y สำหรับบรรทัดถัดไป
-    }
-
+    // สำหรับบรรทัดถัดไป (กรณีข้อความยาวเกิน MultiCell จะจัดการขึ้นบรรทัดใหม่อัตโนมัติ)
+    $current_y = $pdf->GetY(); // ได้ตำแหน่ง Y ปัจจุบันหลังแสดงผลบรรทัดแรก
+    $pdf->SetXY($other_lines_x, $current_y);
+    $pdf->MultiCell($cell_width, $line_height, "", 0, 'L'); // แสดงข้อความที่เหลือ (หากมี)
 
 
     // --- ดึงหน้า 2 ---
@@ -528,36 +569,47 @@ try {
             $pdf->MultiCell(120, 8, ($purpose_text), 0, 'L'); // แสดงข้อความที่กรอก
         }
     }
+    // กำหนดตำแหน่งและขนาดข้อความ
+    $x_position = 30; // ตำแหน่ง X
+    $y_position = 165.5; // ตำแหน่ง Y
+    $cell_width = 150; // ความกว้างของข้อความ
+    $line_height = 8; // ระยะห่างระหว่างบรรทัด
 
-    $max_chars_first_line = 110; // ความยาวสูงสุดสำหรับบรรทัดแรก
-    $max_chars_other_lines = 120; // ความยาวสูงสุดสำหรับบรรทัดถัดไป
+    // เพิ่มย่อหน้าเฉพาะตอนแสดงข้อความ
+    $indented_notes = "                                  " . $notes; // เพิ่มย่อหน้าเฉพาะตอนส่งให้ MultiCell
 
-    // ตำแหน่งเริ่มต้น
-    $first_line_x = 70; // ตำแหน่ง X สำหรับบรรทัดแรก
-    $first_line_y = 165.5; // ตำแหน่ง Y สำหรับบรรทัดแรก
-    $other_lines_x = 30; // ตำแหน่ง X สำหรับบรรทัดถัดไป (เยื้องเข้ามา)
-    $line_height = 8; // ความสูงระหว่างบรรทัด
+    // ใช้ MultiCell แสดงข้อความ
+    $pdf->SetXY($x_position, $y_position);
+    $pdf->MultiCell($cell_width, $line_height, $indented_notes, 0, 'L');
+    // $max_chars_first_line = 110; // ความยาวสูงสุดสำหรับบรรทัดแรก
+    // $max_chars_other_lines = 120; // ความยาวสูงสุดสำหรับบรรทัดถัดไป
 
-    // แยกข้อความตามการกด Enter (\n)
-    $lines = explode("\n", $benefit_of_use);
-    $current_y = $first_line_y; // ตำแหน่ง Y เริ่มต้น
+    // // ตำแหน่งเริ่มต้น
+    // $first_line_x = 70; // ตำแหน่ง X สำหรับบรรทัดแรก
+    // $first_line_y = 165.5; // ตำแหน่ง Y สำหรับบรรทัดแรก
+    // $other_lines_x = 30; // ตำแหน่ง X สำหรับบรรทัดถัดไป (เยื้องเข้ามา)
+    // $line_height = 8; // ความสูงระหว่างบรรทัด
 
-    foreach ($lines as $index => $line) {
-        // ตัดข้อความยาวเกินในแต่ละบรรทัด
-        $wrapped_lines = explode("\n", wordwrap($line, $index === 0 ? $max_chars_first_line : $max_chars_other_lines, "\n", true));
+    // // แยกข้อความตามการกด Enter (\n)
+    // $lines = explode("\n", $benefit_of_use);
+    // $current_y = $first_line_y; // ตำแหน่ง Y เริ่มต้น
 
-        foreach ($wrapped_lines as $wrapped_index => $wrapped_line) {
-            // กำหนดตำแหน่ง X
-            $current_x = ($index === 0 && $wrapped_index === 0) ? $first_line_x : $other_lines_x;
+    // foreach ($lines as $index => $line) {
+    //     // ตัดข้อความยาวเกินในแต่ละบรรทัด
+    //     $wrapped_lines = explode("\n", wordwrap($line, $index === 0 ? $max_chars_first_line : $max_chars_other_lines, "\n", true));
 
-            // แสดงข้อความ
-            $pdf->SetXY($current_x, $current_y);
-            $pdf->MultiCell(0, $line_height, $wrapped_line, 0, 'L');
+    //     foreach ($wrapped_lines as $wrapped_index => $wrapped_line) {
+    //         // กำหนดตำแหน่ง X
+    //         $current_x = ($index === 0 && $wrapped_index === 0) ? $first_line_x : $other_lines_x;
 
-            // ปรับตำแหน่ง Y สำหรับบรรทัดถัดไป
-            $current_y += $line_height;
-        }
-    }
+    //         // แสดงข้อความ
+    //         $pdf->SetXY($current_x, $current_y);
+    //         $pdf->MultiCell(0, $line_height, $wrapped_line, 0, 'L');
+
+    //         // ปรับตำแหน่ง Y สำหรับบรรทัดถัดไป
+    //         $current_y += $line_height;
+    //     }
+    // }
 
 
     $attached_documents_positions = [
@@ -579,21 +631,42 @@ try {
             $pdf->MultiCell(120, 8, $other_attached_documents_text, 0, 'L');
         }
     }
+    // เพิ่มช่องว่างสำหรับย่อหน้าบรรทัดแรก
+    $notes = "                " . $notes; // เพิ่ม 4 ช่องว่างสำหรับย่อหน้าบรรทัดแรก
 
     // กำหนดตำแหน่งสำหรับหมายเหตุ
-    $notes_x = 45; // ตำแหน่ง X สำหรับข้อความ
+    $notes_x = 27; // ตำแหน่ง X สำหรับข้อความ
     $notes_y = 198; // ตำแหน่ง Y สำหรับข้อความ
-    $max_chars_per_line = 120; // จำนวนตัวอักษรสูงสุดต่อบรรทัด
+    $cell_width = 150; // กำหนดความกว้างของข้อความ
     $line_height = 8; // ระยะห่างระหว่างบรรทัด
 
     // ใช้ MultiCell เพื่อแสดงข้อความหมายเหตุ
     $pdf->SetXY($notes_x, $notes_y);
-    $pdf->MultiCell(0, $line_height, $notes, 0, 'L');
+    $pdf->MultiCell($cell_width, $line_height, $notes, 0, 'L');
+    // // กำหนดตำแหน่งสำหรับหมายเหตุ
+    // $notes_x = 45; // ตำแหน่ง X สำหรับข้อความ
+    // $notes_y = 198; // ตำแหน่ง Y สำหรับข้อความ
+    // $max_chars_per_line = 120; // จำนวนตัวอักษรสูงสุดต่อบรรทัด
+    // $line_height = 8; // ระยะห่างระหว่างบรรทัด
+
+    // // ใช้ MultiCell เพื่อแสดงข้อความหมายเหตุ
+    // $pdf->SetXY($notes_x, $notes_y);
+    // $pdf->MultiCell(0, $line_height, $notes, 0, 'L');
     // กำหนดตำแหน่งสำหรับวันที่
-    $date_x = 147; // ตำแหน่ง X
-    $date_y = 258;  // ตำแหน่ง Y
-    $pdf->SetXY($date_x, $date_y);
-    $pdf->Write(0, $date_today); // แสดงวันที่
+    // $date_today = formatThaiDate(date("Y-m-d"));
+    // $date_x = 147; // ตำแหน่ง X
+    // $date_y = 258;  // ตำแหน่ง Y
+    // $pdf->SetXY($date_x, $date_y);
+    // $pdf->Write(0, $date_today); // แสดงวันที่
+
+    $current_date_thai = thaiDate(date('Y-m-d'));
+    $current_date_thai_cp874 = iconv('UTF-8', 'cp874', $current_date_thai);
+
+    $pdf->SetXY(146, 258);
+    $pdf->Write(0, $current_date_thai_cp874);
+
+
+
 
     // --- ดึงหน้า 3 ---
     $pdf->AddPage();
@@ -603,13 +676,13 @@ try {
     // ตำแหน่งเครื่องหมายถูกและข้อความสำหรับ "ผู้อำนวยการสำนัก"
     $director_positions = [
         'เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 44],
-        'ไม่เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 55, 'text_x' => 77, 'text_y' => 54],
+        'ไม่เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 55, 'text_x' => 27, 'text_y' => 54],
     ];
 
     // ตำแหน่งเครื่องหมายถูกและข้อความสำหรับ "ผู้จัดการโครงการ"
     $project_manager_positions = [
         'เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 150],
-        'ไม่เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 160, 'text_x' => 77, 'text_y' => 160],
+        'ไม่เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 160, 'text_x' => 27, 'text_y' => 160],
     ];
 
     // แสดงผลสำหรับ "ผู้อำนวยการสำนัก"
@@ -620,9 +693,20 @@ try {
         $pdf->Image(__DIR__ . '/correct1.png', $position['checkmark_x'], $position['checkmark_y'], 5, 5);
 
         // หากเลือก "ไม่เห็นชอบ" ให้แสดงเหตุผล
+        // 
         if ($director_approval === 'ไม่เห็นชอบ' && !empty($director_reason)) {
-            $pdf->SetXY($position['text_x'], $position['text_y']);
-            $pdf->MultiCell(120, 8, $director_reason, 0, 'L');
+            // กำหนดตำแหน่งและขนาดสำหรับข้อความ
+            $text_x = $position['text_x']; // ตำแหน่ง X
+            $text_y = $position['text_y']; // ตำแหน่ง Y
+            $cell_width = 120; // ความกว้างของข้อความ
+            $line_height = 8; // ระยะห่างระหว่างบรรทัด
+
+            // เพิ่มข้อความย่อหน้าสำหรับการแสดง
+            $indented_director_reason = "                                          " . $director_reason; // เพิ่มย่อหน้าเฉพาะตอนแสดง
+
+            // แสดงข้อความ
+            $pdf->SetXY($text_x, $text_y);
+            $pdf->MultiCell($cell_width, $line_height, $indented_director_reason, 0, 'L');
         }
     }
 
@@ -635,26 +719,56 @@ try {
 
         // หากเลือก "ไม่เห็นชอบ" ให้แสดงเหตุผล
         if ($project_manager_approval === 'ไม่เห็นชอบ' && !empty($project_manager_reason)) {
-            $pdf->SetXY($position['text_x'], $position['text_y']);
-            $pdf->MultiCell(120, 8, $project_manager_reason, 0, 'L');
+            // กำหนดตำแหน่งและขนาดสำหรับข้อความ
+            $text_x = $position['text_x']; // ตำแหน่ง X
+            $text_y = $position['text_y']; // ตำแหน่ง Y
+            $cell_width = 120; // ความกว้างของข้อความ
+            $line_height = 8; // ระยะห่างระหว่างบรรทัด
+        
+            // จัดการข้อความ: ลบช่องว่างซ้อนกัน
+            $formatted_reason = preg_replace('/\s+/', ' ', $project_manager_reason); // แปลงช่องว่างซ้อนให้เหลือช่องว่างเดียว
+            $formatted_reason = trim($formatted_reason); // ลบช่องว่างหน้าหรือท้ายข้อความ
+        
+            // เพิ่มข้อความย่อหน้าสำหรับการแสดง
+            $indented_reason = "                                         " . $formatted_reason; // เพิ่มย่อหน้าเฉพาะตอนแสดง
+        
+            // แสดงข้อความ
+            $pdf->SetXY($text_x, $text_y);
+            $pdf->MultiCell($cell_width, $line_height, $indented_reason, 0, 'L');
         }
     }
+    // $pdf->SetXY(145, 125);
+    // $pdf->Write(0, $date_today); // แสดงวันที่
+    $current_date_thai = thaiDate(date('Y-m-d'));
+    $current_date_thai_cp874 = iconv('UTF-8', 'cp874', $current_date_thai);
+
     $pdf->SetXY(145, 125);
-    $pdf->Write(0, $date_today); // แสดงวันที่
+    $pdf->Write(0, $current_date_thai_cp874);
+
+    // $pdf->SetXY(145, 230);
+    // $pdf->Write(0, $date_today); // แสดงวันที่
+    $current_date_thai = thaiDate(date('Y-m-d'));
+    $current_date_thai_cp874 = iconv('UTF-8', 'cp874', $current_date_thai);
 
     $pdf->SetXY(145, 230);
-    $pdf->Write(0, $date_today); // แสดงวันที่
+    $pdf->Write(0, $current_date_thai_cp874);
     // --- ดึงหน้า 4 ---
     $pdf->AddPage();
     $page4 = $pdf->importPage(4);
     $pdf->useTemplate($page4);
-
     $pdf->SetXY(145, 117);
-    $pdf->Write(0, $date_today); // แสดงวันที่
+    $pdf->Write(0, $current_date_thai_cp874);
+
+    // $pdf->SetXY(145, 230);
+    // $pdf->Write(0, $date_today); // แสดงวันที่
+    $current_date_thai = thaiDate(date('Y-m-d'));
+    $current_date_thai_cp874 = iconv('UTF-8', 'cp874', $current_date_thai);
+    // $pdf->SetXY(145, 117);
+    // $pdf->Write(0, $date_today); // แสดงวันที่
     // ตำแหน่งเครื่องหมายถูกและข้อความสำหรับ "ผู้ร่วมวิจัย"
     $research_collaborator_positions = [
         'เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 36],
-        'ไม่เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 47, 'text_x' => 77, 'text_y' => 46],
+        'ไม่เห็นชอบ' => ['checkmark_x' => 39, 'checkmark_y' => 47, 'text_x' => 27, 'text_y' => 46],
     ];
 
     // แสดงผลสำหรับ "ผู้ร่วมวิจัย"
@@ -666,8 +780,22 @@ try {
 
         // หากเลือก "ไม่เห็นชอบ" ให้แสดงเหตุผล
         if ($research_collaborator_approval === 'ไม่เห็นชอบ' && !empty($research_collaborator_reason)) {
-            $pdf->SetXY($position['text_x'], $position['text_y']);
-            $pdf->MultiCell(120, 8, $research_collaborator_reason, 0, 'L');
+            // กำหนดตำแหน่งและขนาดสำหรับข้อความ
+            $text_x = $position['text_x']; // ตำแหน่ง X
+            $text_y = $position['text_y']; // ตำแหน่ง Y
+            $cell_width = 120; // ความกว้างของข้อความ
+            $line_height = 8; // ระยะห่างระหว่างบรรทัด
+        
+            // จัดการข้อความ: ลบช่องว่างซ้อนกัน
+            $formatted_reason = preg_replace('/\s+/', ' ', $research_collaborator_reason); // แปลงช่องว่างซ้อนให้เหลือช่องว่างเดียว
+            $formatted_reason = trim($formatted_reason); // ลบช่องว่างหน้าหรือท้ายข้อความ
+        
+            // เพิ่มข้อความย่อหน้าสำหรับการแสดง
+            $indented_reason = "                                        " . $formatted_reason; // เพิ่มย่อหน้าเฉพาะตอนแสดง
+        
+            // แสดงข้อความ
+            $pdf->SetXY($text_x, $text_y);
+            $pdf->MultiCell($cell_width, $line_height, $indented_reason, 0, 'L');
         }
     }
     // ส่งออก PDF

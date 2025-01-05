@@ -53,19 +53,23 @@ $logged_in_role = $_SESSION['role'] ?? 'User'; // บทบาทผู้ใช
                     <i class="fas fa-home w-5"></i>
                     <span class="ml-3">Unreviewed academic article</span>
                 </a>
+                <a href="Edit_Article_Evaluation_form.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
+                    <i class="fas fa-file-alt w-5"></i>
+                    <span class="ml-3">Edit Article Evaluation</span>
+                </a>
                 <a href="courses.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
                     <i class="fas fa-book w-5"></i>
                     <span class="ml-3">Verified Article</span>
                 </a>
-                <!-- <a href="research.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
-                    <i class="fas fa-microscope w-5"></i>
-                    <span class="ml-3">Research</span>
-                </a>
-                <a href="publications.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
-                    <i class="fas fa-file-alt w-5"></i>
-                    <span class="ml-3">Publications</span>
-                </a>
-                <a href="library.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
+                <!-- <a href="edit_article.php?id=<?php echo $article['id']; ?>"
+                    class="inline-flex items-center justify-center px-4 py-2.5 text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 rounded-lg font-medium transition duration-200 group">
+                    <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232a3 3 0 114.243 4.243L8.475 20.475a3 3 0 01-1.414.829l-4.242.848a1 1 0 01-1.2-1.2l.848-4.242a3 3 0 01.829-1.414L15.232 5.232z"></path>
+                    </svg>
+                    Edit Article
+                </a> -->
+               
+                <!-- <a href="library.php" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors duration-200">
                     <i class="fas fa-books w-5"></i>
                     <span class="ml-3">Library</span>
                 </a>
